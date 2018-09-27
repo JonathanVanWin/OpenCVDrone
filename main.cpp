@@ -11,8 +11,8 @@ void imageProcessing()
 {
 	Mat img_gray, postering;
 	//fastNlMeansDenoising(g_src, g_src);
-	//pyrMeanShiftFiltering(g_src, postering, 20, 40, 2);
-	cvtColor(g_src, img_gray, COLOR_BGR2GRAY);
+	pyrMeanShiftFiltering(g_src, postering, 20, 40, 2);
+	cvtColor(postering, img_gray, COLOR_BGR2GRAY);
 	//GaussianBlur(img_gray, img_gray, Size(5, 5), 0);
 	threshold(img_gray, img_gray, 0, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
 
