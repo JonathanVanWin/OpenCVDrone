@@ -18,7 +18,7 @@ void imageProcessing()
 
 	//erode(img_gray, img_gray, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)), Point(-1,-1),2);
 	//dilate(img_gray, img_gray, getStructuringElement(MORPH_ELLIPSE, Size(3, 3)), Point(-1, -1), 1);
-	Canny(img_gray, g_img_canny, 120, 150, 3,true);
+	Canny(img_gray, g_img_canny, 120, 150, 3, true);
 	//morphologyEx(g_img_canny, g_img_canny, MORPH_CLOSE, getStructuringElement(CV_SHAPE_RECT, Size(9, 9)));
 
 	imshow("Canny", g_img_canny);
@@ -37,7 +37,7 @@ void drawLines(bool withHough)
 		int largest_area = 0;
 		int largest_contour_index = 0;
 		Rect bounding_rect;
-		
+
 		for (size_t i = 0; i < contours.size(); i++) // iterate through each contour.
 		{
 			double area = contourArea(contours[i]);  //  Find the area of contour
