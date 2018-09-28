@@ -9,7 +9,7 @@ class ImagePreprocessor
 public:
 	Mat m_src, m_imgGray, m_imgCanny;
 
-	ImagePreprocessor(const char* path);
+	ImagePreprocessor(const char* path, bool withAutoThreshold = false, bool withPostering = false, bool withCanny = false);
 	~ImagePreprocessor();
 
 	void drawLines(bool withContours, bool drawAllContours);

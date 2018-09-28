@@ -1,38 +1,35 @@
 #include "ImagePreprocessor.h"
 
-
-
-ImagePreprocessor::ImagePreprocessor(const char* path)
+// if withAutoThreshold = true, OTSU algorithm will find optimum thresold
+// if withPostering = true, we will get a filtered “posterized” image with color gradients and fine-grain texture flattened.
+// if withCanny = true, we will use an edge detection technique, for finding the boundaries of objects within images.
+ImagePreprocessor::ImagePreprocessor(const char* path, bool withAutoThreshold, bool withPostering, bool withCanny)
 {
 	m_src = imread(path);
-	Mat postering;
-	//fastNlMeansDenoising(g_src, g_src);
-	/*pyrMeanShiftFiltering(g_src, postering, 20, 40, 2);
-	cvtColor(postering, img_gray, COLOR_BGR2GRAY);
-	GaussianBlur(img_gray, img_gray, Size(5, 5), 0);
-	threshold(img_gray, img_gray, 0, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
+	Mat postering = m_src;
+	if (withPostering)
+		pyrMeanShiftFiltering(m_src, postering, 20, 40, 2); //This values work fairly well
 
-	erode(img_gray, img_gray, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)), Point(-1,-1),2);
-	dilate(img_gray, img_gray, getStructuringElement(MORPH_ELLIPSE, Size(3, 3)), Point(-1, -1), 1);
-	Canny(img_gray, g_img_canny, 120, 150, 3, true);
-	morphologyEx(g_img_canny, g_img_canny, MORPH_CLOSE, getStructuringElement(CV_SHAPE_RECT, Size(9, 9)));
-
-	imshow("Canny", g_img_canny);*/
-	cvtColor(m_src, m_imgGray, COLOR_BGR2GRAY);
+	cvtColor(postering, m_imgGray, COLOR_BGR2GRAY);
 	GaussianBlur(m_imgGray, m_imgGray, Size(5, 5), 0);
 
-	threshold(m_imgGray, m_imgCanny, 125, 255, THRESH_BINARY);
-	//morphological opening (remove small objects from the foreground)
-	erode(m_imgCanny, m_imgCanny, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
-	dilate(m_imgCanny, m_imgCanny, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
+	if (withAutoThreshold)
+		threshold(m_imgGray, m_imgCanny, 0, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
+	else
+		threshold(m_imgGray, m_imgCanny, 125, 255, THRESH_BINARY);
 
-	//morphological closing (fill small holes in the foreground)
-	dilate(m_imgCanny, m_imgCanny, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
-	erode(m_imgCanny, m_imgCanny, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
+	if (withCanny)
+		Canny(m_imgCanny, m_imgCanny, 120, 150, 3);
+
+	// MORPH_OPEN = Remove small objects from the img
+	morphologyEx(m_imgCanny, m_imgCanny, MORPH_OPEN, getStructuringElement(MORPH_ELLIPSE, Size(7, 7)), Point(-1, -1), 2);
+
+	// MORPH_CLOSE = Fill small holes in the img
+	morphologyEx(m_imgCanny, m_imgCanny, MORPH_CLOSE, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
+
 	imshow("Canny", m_imgCanny);
 	imshow("Window", m_imgGray);
 }
-
 
 ImagePreprocessor::~ImagePreprocessor()
 {
