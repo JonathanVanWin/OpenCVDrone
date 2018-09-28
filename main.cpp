@@ -25,35 +25,47 @@ void imageProcessing()
 	imshow("Window", img_gray);
 }
 
-void drawLines(bool withHough)
+void drawLines(bool withContours, bool drawAllContours)
 {
-	if (withHough)
+	if (withContours)
 	{
 		std::vector<std::vector<Point> > contours; // Vector for storing contours
 		std::vector<Vec4i> hierarchy;
 
 		findContours(g_img_canny, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0)); // Find the contours in the image
 
-		int largest_area = 0;
-		int largest_contour_index = 0;
-		Rect bounding_rect;
-
-		for (size_t i = 0; i < contours.size(); i++) // iterate through each contour.
-		{
-			double area = contourArea(contours[i]);  //  Find the area of contour
-
-			if (area > largest_area)
-			{
-				largest_area = area;
-				largest_contour_index = i;               //Store the index of largest contour
-				bounding_rect = boundingRect(contours[i]); // Find the bounding rectangle for biggest contour
-			}
-		}
-
 		RNG rng(12345);
 		Scalar color = Scalar(rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(0, 255));
-		drawContours(g_src, contours, largest_contour_index, color, 2, 8, hierarchy, 0, Point()); // Draw the largest contour using previously stored index.
-		imshow("Contours", g_src(bounding_rect));
+
+		if (drawAllContours)
+		{
+			for (size_t i = 0; i < contours.size(); i++) // iterate through each contour.
+			{
+				drawContours(g_src, contours, i, color, 2, 8, hierarchy, 0, Point());
+			}
+		}
+		else
+		{
+			int largest_area = 0;
+			int largest_contour_index = 0;
+			Rect bounding_rect;
+
+			for (size_t i = 0; i < contours.size(); i++) // iterate through each contour.
+			{
+				double area = contourArea(contours[i]);  //  Find the area of contour
+
+				if (area > largest_area)
+				{
+					largest_area = area;
+					largest_contour_index = i;               //Store the index of largest contour
+					bounding_rect = boundingRect(contours[i]); // Find the bounding rectangle for biggest contour
+				}
+			}
+
+			drawContours(g_src, contours, largest_contour_index, color, 2, 8, hierarchy, 0, Point()); // Draw the largest contour using previously stored index.
+			g_src = g_src(bounding_rect);
+		}
+		imshow("Contours", g_src);
 	}
 	else
 	{
@@ -86,7 +98,7 @@ int main()
 	g_src = imread("C:\\Users\\grand_000\\Pictures\\1200px-MMLNorr1.JPG", CV_LOAD_IMAGE_COLOR);
 	namedWindow("Window");
 	imageProcessing();
-	drawLines(true);
+	drawLines(true, true);
 	waitKey(0);
 	destroyAllWindows();
 	return 0;
