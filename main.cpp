@@ -11,16 +11,28 @@ void imageProcessing()
 {
 	Mat img_gray, postering;
 	//fastNlMeansDenoising(g_src, g_src);
-	pyrMeanShiftFiltering(g_src, postering, 20, 40, 2);
+	/*pyrMeanShiftFiltering(g_src, postering, 20, 40, 2);
 	cvtColor(postering, img_gray, COLOR_BGR2GRAY);
-	//GaussianBlur(img_gray, img_gray, Size(5, 5), 0);
+	GaussianBlur(img_gray, img_gray, Size(5, 5), 0);
 	threshold(img_gray, img_gray, 0, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
 
-	//erode(img_gray, img_gray, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)), Point(-1,-1),2);
-	//dilate(img_gray, img_gray, getStructuringElement(MORPH_ELLIPSE, Size(3, 3)), Point(-1, -1), 1);
+	erode(img_gray, img_gray, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)), Point(-1,-1),2);
+	dilate(img_gray, img_gray, getStructuringElement(MORPH_ELLIPSE, Size(3, 3)), Point(-1, -1), 1);
 	Canny(img_gray, g_img_canny, 120, 150, 3, true);
-	//morphologyEx(g_img_canny, g_img_canny, MORPH_CLOSE, getStructuringElement(CV_SHAPE_RECT, Size(9, 9)));
+	morphologyEx(g_img_canny, g_img_canny, MORPH_CLOSE, getStructuringElement(CV_SHAPE_RECT, Size(9, 9)));
 
+	imshow("Canny", g_img_canny);*/
+	cvtColor(g_src, img_gray, COLOR_BGR2GRAY);
+	GaussianBlur(img_gray, img_gray, Size(5, 5), 0);
+
+	threshold(img_gray, g_img_canny, 125, 255, THRESH_BINARY);
+	//morphological opening (remove small objects from the foreground)
+	erode(g_img_canny, g_img_canny, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
+	dilate(g_img_canny, g_img_canny, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
+
+	//morphological closing (fill small holes in the foreground)
+	dilate(g_img_canny, g_img_canny, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
+	erode(g_img_canny, g_img_canny, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
 	imshow("Canny", g_img_canny);
 	imshow("Window", img_gray);
 }
@@ -98,7 +110,7 @@ int main()
 	g_src = imread("C:\\Users\\grand_000\\Pictures\\1200px-MMLNorr1.JPG", CV_LOAD_IMAGE_COLOR);
 	namedWindow("Window");
 	imageProcessing();
-	drawLines(true, true);
+	drawLines(true, false);
 	waitKey(0);
 	destroyAllWindows();
 	return 0;
