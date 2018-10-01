@@ -11,7 +11,6 @@ public:
 
 	ImagePreprocessor(const char* path, bool withAutoThreshold = false, bool withPostering = false, bool withCanny = false);
 	~ImagePreprocessor();
-
 	void drawLines(bool withContours, bool drawAllContours);
 	
 };
